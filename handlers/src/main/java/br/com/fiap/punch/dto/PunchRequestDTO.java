@@ -1,4 +1,6 @@
 package br.com.fiap.punch.dto;
 
-public record PunchRequestDTO(String event) {
+import br.com.fiap.punch.PunchEvent;
+
+public record PunchRequestDTO(PunchEvent event) {
 }

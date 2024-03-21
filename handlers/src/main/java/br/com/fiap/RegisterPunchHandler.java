@@ -37,7 +37,7 @@ public class RegisterPunchHandler implements RequestHandler<APIGatewayProxyReque
 
             PreparedStatement preparedStatement = connection.prepareStatement("insert into punch (user_id, event, punch_date) values (?, ?, ?)");
             preparedStatement.setInt(1, 1);
-            preparedStatement.setString(2, punchRequestDTO.event());
+            preparedStatement.setString(2, punchRequestDTO.event().toString());
             preparedStatement.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now(ZoneId.of("America/Sao_Paulo"))));
             preparedStatement.execute();
 
