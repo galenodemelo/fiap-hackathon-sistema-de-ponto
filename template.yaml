@@ -60,7 +60,7 @@ Resources:
       MemorySize: 512
       Events:
         RegisterPunch:
-          Type: Api
+          Type: HttpApi
           Properties:
             Path: /punch
             Method: post
