@@ -4,6 +4,7 @@ import br.com.fiap.punch.dto.PunchDateResponseDTO;
 import br.com.fiap.punch.dto.PunchListResponseDTO;
 import br.com.fiap.punch.dto.PunchResponseDTO;
 import br.com.fiap.util.DatabaseConnection;
+import br.com.fiap.util.DateUtils;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
@@ -29,21 +30,19 @@ public class ListPunchesHandler implements RequestHandler<APIGatewayProxyRequest
 
         try {
             ResultSet resultSet = getPunchResultSet();
-
             Map<Date, List<PunchResponseDTO>> punches = new HashMap<>();
 
             while (resultSet.next()) {
                 Timestamp punchDate = resultSet.getTimestamp("punch_date");
                 String event = resultSet.getString("event");
 
-                Date date = new Date(clearTime(punchDate));
+                Date date = new Date(DateUtils.clearTime(punchDate));
                 if (!punches.containsKey(date)) punches.put(date, new ArrayList<>());
 
                 punches.get(date).add(new PunchResponseDTO(punchDate, event));
             }
 
             List<PunchDateResponseDTO> punchDates = new ArrayList<>();
-
             Iterator<Map.Entry<Date, List<PunchResponseDTO>>> iterator = punches.entrySet().iterator();
 
             while (iterator.hasNext()) {
@@ -51,19 +50,20 @@ public class ListPunchesHandler implements RequestHandler<APIGatewayProxyRequest
                 punchDates.add(new PunchDateResponseDTO(entry.getKey(), entry.getValue()));
             }
 
+            Collections.sort(punchDates, new Comparator<PunchDateResponseDTO>() {
+                @Override
+                public int compare(PunchDateResponseDTO o1, PunchDateResponseDTO o2) {
+                    return o1.getDate().getTime() < o2.getDate().getTime() ? -1 : 1;
+                }
+            });
+
             PunchListResponseDTO punchListResponseDTO = new PunchListResponseDTO(punchDates);
 
             ObjectMapper objectMapper = new ObjectMapper();
-//            objectMapper.disable(SerializationFeature.WRITE_DATE_KEYS_AS_TIMESTAMPS);
-
-            Map<String, PunchListResponseDTO> map = new HashMap<>();
-            map.put("teste", new PunchListResponseDTO(new ArrayList<>()));
-
-            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(punchListResponseDTO);
+            String json = objectMapper.writeValueAsString(punchListResponseDTO);
 
             return response.withStatusCode(200).withBody(json);
         } catch (Exception exception) {
-            exception.printStackTrace();
             return response.withStatusCode(500);
         }
     }
@@ -76,7 +76,7 @@ public class ListPunchesHandler implements RequestHandler<APIGatewayProxyRequest
 
             Connection connection = DatabaseConnection.getConnection();
 
-            final String query = "select punch_date, event from punch where user_id = ? and punch_date between ? and ? order by punch_date";
+            final String query = "select punch_date, event from punch where user_id = ? and punch_date >= ? and punch_date < ? order by punch_date";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, 1);
             preparedStatement.setTimestamp(2, Timestamp.valueOf(initialDate));
@@ -88,17 +88,5 @@ public class ListPunchesHandler implements RequestHandler<APIGatewayProxyRequest
         } catch (SQLException exception) {
             throw new RuntimeException(exception);
         }
-    }
-
-    private static long clearTime(Timestamp date) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(date.getTime());
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        long time = cal.getTimeInMillis();
-
-        return time;
     }
 }
