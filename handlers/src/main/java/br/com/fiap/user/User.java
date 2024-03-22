@@ -24,12 +24,23 @@ public class User {
         ResultSet result = statement.executeQuery();
         if (!result.next()) return null;
 
-        User user = new User();
-        user.setId(result.getLong("id"));
-        user.setName(result.getString("name"));
-        user.setEmail(result.getString("email"));
-        user.setPassword(result.getString("password"));
+        User user = buildUser(result);
+        statement.close();
 
+        return user;
+    }
+
+    public static User findById(Long id) throws SQLException {
+        PreparedStatement statement = DatabaseConnection.getConnection().prepareStatement(
+            "SELECT * FROM user WHERE id = ?"
+        );
+        statement.setLong(1, id);
+        statement.setMaxRows(1);
+
+        ResultSet result = statement.executeQuery();
+        if (!result.next()) return null;
+
+        User user = buildUser(result);
         statement.close();
 
         return user;
@@ -65,5 +76,15 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    private static User buildUser(ResultSet resultSet) throws SQLException {
+        User user = new User();
+        user.setId(resultSet.getLong("id"));
+        user.setName(resultSet.getString("name"));
+        user.setEmail(resultSet.getString("email"));
+        user.setPassword(resultSet.getString("password"));
+
+        return user;
     }
 }
