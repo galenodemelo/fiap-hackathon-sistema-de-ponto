@@ -9,6 +9,9 @@ Globals:
     MemorySize: 512
 
 Resources:
+  ApiGateway:
+    Type: AWS::Serverless::HttpApi
+
   ListPunchesFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -20,10 +23,12 @@ Resources:
       MemorySize: 512
       Events:
         ListPunches:
-          Type: Api
+          Type: HttpApi
           Properties:
+            ApiId: !Ref ApiGateway
             Path: /punches
             Method: get
+
   RegisterPunchesFunction:
     Type: AWS::Serverless::Function
     Properties:
