@@ -14,6 +14,15 @@ public class ResponseUtils {
         return respond(false, message, 400);
     }
 
+    public static APIGatewayProxyResponseEvent internalServerError(String message) {
+        try {
+            return respond(false, message, 500);
+        } catch (JsonProcessingException exception) {
+            LogUtils.logException(exception);
+            return null;
+        }
+    }
+
     private static APIGatewayProxyResponseEvent respond(Boolean success, String message, Integer statusCode) throws JsonProcessingException {
         String body = new ResponseDTO(message, success).toJson();
 

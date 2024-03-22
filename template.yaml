@@ -64,3 +64,20 @@ Resources:
           Properties:
             Path: /punch
             Method: post
+
+  AskForReportFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: handlers
+      Handler: br.com.fiap.AskForReportHandler::handleRequest
+      Runtime: java17
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Events:
+        AskForReport:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref ApiGateway
+            Path: /report
+            Method: post
