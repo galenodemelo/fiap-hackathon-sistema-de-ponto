@@ -1,17 +1,16 @@
 package br.com.fiap;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import br.com.fiap.util.DatabaseConnection;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+
+import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Handler for requests to Lambda function.
@@ -21,28 +20,42 @@ public class ListPunchesHandler implements RequestHandler<APIGatewayProxyRequest
     public APIGatewayProxyResponseEvent handleRequest(final APIGatewayProxyRequestEvent input, final Context context) {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
-        headers.put("X-Custom-Header", "application/json");
 
-        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent()
-                .withHeaders(headers);
+        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent().withHeaders(headers);
+
         try {
-            final String pageContents = this.getPageContents("https://checkip.amazonaws.com");
-            String output = String.format("{ \"message\": \"hello world\", \"location\": \"%s\" }", pageContents);
+            ResultSet resultSet = getPunchResultSet();
 
-            return response
-                    .withStatusCode(200)
-                    .withBody(output);
-        } catch (IOException e) {
-            return response
-                    .withBody("{}")
-                    .withStatusCode(500);
+            while (resultSet.next()) {
+                
+            }
+
+
+            return response.withStatusCode(200).withBody("");
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return response.withStatusCode(500);
         }
     }
 
-    private String getPageContents(String address) throws IOException{
-        URL url = new URL(address);
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()))) {
-            return br.lines().collect(Collectors.joining(System.lineSeparator()));
+    private ResultSet getPunchResultSet() {
+        try {
+            final Integer retroactiveNumberOfDays = 30;
+            LocalDateTime finalDate = LocalDate.now().atStartOfDay().plusDays(1);
+            LocalDateTime initialDate = finalDate.minusDays(retroactiveNumberOfDays);
+
+            Connection connection = DatabaseConnection.getConnection();
+
+            final String query = "select * from punch where punch_date between ? and ? order by punch_date";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setTimestamp(1, Timestamp.valueOf(initialDate));
+            preparedStatement.setTimestamp(2, Timestamp.valueOf(finalDate));
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            return resultSet;
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
         }
     }
 }
