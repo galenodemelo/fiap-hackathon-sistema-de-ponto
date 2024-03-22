@@ -46,7 +46,7 @@ Resources:
           Type: HttpApi
           Properties:
             ApiId: !Ref ApiGateway
-            Path: /punches
+            Path: /punch
             Method: get
 
   RegisterPunchesFunction:
