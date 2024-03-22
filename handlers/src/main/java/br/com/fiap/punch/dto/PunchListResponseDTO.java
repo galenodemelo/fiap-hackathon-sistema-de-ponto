@@ -1,6 +1,15 @@
 package br.com.fiap.punch.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.util.List;
 
-public record PunchListResponseDTO(List<PunchDateResponseDTO> dates) {
+@JsonDeserialize
+public class PunchListResponseDTO {
+
+    List<PunchDateResponseDTO> dates;
+
+    public PunchListResponseDTO(List<PunchDateResponseDTO> dates) {
+        this.dates = dates;
+    }
 }
