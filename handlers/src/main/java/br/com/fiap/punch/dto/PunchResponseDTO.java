@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 @JsonDeserialize
 public class PunchResponseDTO {
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="s")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="HH:mm")
     private Timestamp punch;
     private String event;
 
@@ -23,5 +23,13 @@ public class PunchResponseDTO {
 
     public String getEvent() {
         return event;
+    }
+
+    public void setPunch(Timestamp punch) {
+        this.punch = punch;
+    }
+
+    public void setEvent(String event) {
+        this.event = event;
     }
 }

@@ -12,4 +12,12 @@ public class PunchListResponseDTO {
     public PunchListResponseDTO(List<PunchDateResponseDTO> dates) {
         this.dates = dates;
     }
+
+    public List<PunchDateResponseDTO> getDates() {
+        return dates;
+    }
+
+    public void setDates(List<PunchDateResponseDTO> dates) {
+        this.dates = dates;
+    }
 }
