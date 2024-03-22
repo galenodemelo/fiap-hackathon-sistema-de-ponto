@@ -1,3 +1,33 @@
+# FIAP | Sistema de Ponto
+
+## Banco de dados
+
+Scripts de criação das tabelas
+
+```sql
+CREATE TABLE `user` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `password` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+);
+
+CREATE TABLE `punch` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `user_id` bigint NOT NULL,
+  `event` varchar(255) NOT NULL,
+  `punch_date` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK_USER_ID` (`user_id`),
+  CONSTRAINT `FK_USER_ID` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+);
+```
+
+
+
+
 # sam-app
 
 This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.
