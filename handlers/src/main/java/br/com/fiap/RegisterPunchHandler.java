@@ -1,5 +1,6 @@
 package br.com.fiap;
 
+import br.com.fiap.punch.PunchEvent;
 import br.com.fiap.punch.dto.PunchRequestDTO;
 import br.com.fiap.util.DatabaseConnection;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -33,17 +35,25 @@ public class RegisterPunchHandler implements RequestHandler<APIGatewayProxyReque
                 return response.withBody("{message: Evento de registro não informado}").withStatusCode(400);
             }
 
-            Connection connection = DatabaseConnection.getConnection();
-
-            PreparedStatement preparedStatement = connection.prepareStatement("insert into punch (user_id, event, punch_date) values (?, ?, ?)");
-            preparedStatement.setInt(1, 1);
-            preparedStatement.setString(2, punchRequestDTO.event());
-            preparedStatement.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now(ZoneId.of("America/Sao_Paulo"))));
-            preparedStatement.execute();
+            savePunch(punchRequestDTO.event());
 
             return response.withBody("{success: true}").withStatusCode(200);
         } catch (Exception exception) {
             return response.withStatusCode(500);
+        }
+    }
+
+    private void savePunch(PunchEvent event) {
+        try {
+            Connection connection = DatabaseConnection.getConnection();
+
+            PreparedStatement preparedStatement = connection.prepareStatement("insert into punch (user_id, event, punch_date) values (?, ?, ?)");
+            preparedStatement.setInt(1, 1);
+            preparedStatement.setString(2, event.toString());
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now(ZoneId.of("America/Sao_Paulo"))));
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }
