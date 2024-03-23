@@ -93,6 +93,8 @@ A partir da geração do arquivo, um e-mail é enviado ao solicitante do espelho
 
 ## Banco de dados
 
+O serviço de banco de dados escolhido foi o AWS RDS. Essa escolha se deu em virtude das vantagens em se utilizar um banco de dados relacional, dentre as quais os pontos determinantes foram: integridade referencial e segurança.
+
 O modelo de dados conta com 2 tabelas, conforme modelo abaixo:
 
 ![hackathon-er](https://github.com/galenodemelo/fiap-hackathon-sistema-de-ponto/assets/10313123/cf5e0cc1-a0f1-4afa-848b-77c9d879a154)
