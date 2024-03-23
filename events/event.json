@@ -57,7 +57,11 @@
       "resourcePath": "/{proxy+}",
       "httpMethod": "POST",
       "apiId": "1234567890",
-      "protocol": "HTTP/1.1"
+      "protocol": "HTTP/1.1",
+      "authorizer": {
+        "lambda": {
+          "principalId": 1
+        }
+      }
     }
   }
-  

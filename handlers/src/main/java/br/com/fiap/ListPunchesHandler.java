@@ -3,8 +3,11 @@ package br.com.fiap;
 import br.com.fiap.punch.dto.PunchDateResponseDTO;
 import br.com.fiap.punch.dto.PunchListResponseDTO;
 import br.com.fiap.punch.dto.PunchResponseDTO;
+import br.com.fiap.user.User;
 import br.com.fiap.util.DatabaseConnection;
 import br.com.fiap.util.DateUtils;
+import br.com.fiap.util.LogUtils;
+import br.com.fiap.util.ResponseUtils;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
@@ -29,7 +32,16 @@ public class ListPunchesHandler implements RequestHandler<APIGatewayProxyRequest
         APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent().withHeaders(headers);
 
         try {
-            ResultSet resultSet = getPunchResultSet();
+            Map<String, Object> authorizer = input.getRequestContext().getAuthorizer();
+            Map<String, Object> lambda = (Map) authorizer.get("lambda");
+            String principalId = lambda.get("principalId").toString();
+
+            User currentUser = User.findById(Long.valueOf(principalId));
+            if (currentUser == null) {
+                return ResponseUtils.badRequest("Usuário não encontrado");
+            }
+
+            ResultSet resultSet = getPunchResultSet(currentUser.getId());
             Map<Date, List<PunchResponseDTO>> punches = new HashMap<>();
 
             while (resultSet.next()) {
@@ -64,11 +76,12 @@ public class ListPunchesHandler implements RequestHandler<APIGatewayProxyRequest
 
             return response.withStatusCode(200).withBody(json);
         } catch (Exception exception) {
-            return response.withStatusCode(500);
+            LogUtils.logException(exception);
+            return ResponseUtils.internalServerError(exception.getMessage());
         }
     }
 
-    private ResultSet getPunchResultSet() {
+    private ResultSet getPunchResultSet(Long userId) {
         try {
             final Integer retroactiveNumberOfDays = 30;
             LocalDateTime finalDate = LocalDate.now().atStartOfDay().plusDays(1);
@@ -78,7 +91,7 @@ public class ListPunchesHandler implements RequestHandler<APIGatewayProxyRequest
 
             final String query = "select punch_date, event from punch where user_id = ? and punch_date >= ? and punch_date < ? order by punch_date";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, 1);
+            preparedStatement.setInt(1, userId.intValue());
             preparedStatement.setTimestamp(2, Timestamp.valueOf(initialDate));
             preparedStatement.setTimestamp(3, Timestamp.valueOf(finalDate));
 
