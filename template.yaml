@@ -81,3 +81,24 @@ Resources:
             ApiId: !Ref ApiGateway
             Path: /report
             Method: post
+
+  ReportQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: report-q
+
+  GenerateReportFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: handlers
+      Handler: br.com.fiap.GenerateReportHandler::handleRequest
+      Runtime: java17
+      Architectures:
+        - x86_64
+      MemorySize: 512
+      Events:
+        GenerateReport:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt ReportQueue.Arn
+            BatchSize: 1
