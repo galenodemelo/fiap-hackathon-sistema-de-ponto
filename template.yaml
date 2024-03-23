@@ -52,12 +52,12 @@ Resources:
             Path: /punch
             Method: get
 
-  RegisterPunchesFunction:
+  RegisterPunchFunction:
     Type: AWS::Serverless::Function
     Properties:
       Role: arn:aws:iam::339712985210:role/LabRole
       CodeUri: handlers
-      Handler: br.com.fiap.RegisterPunchesHandler::handleRequest
+      Handler: br.com.fiap.RegisterPunchHandler::handleRequest
       Runtime: java17
       Architectures:
         - x86_64
