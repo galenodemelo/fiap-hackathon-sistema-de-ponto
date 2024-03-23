@@ -8,7 +8,9 @@
 
 O processo de autenticação espera receber as credenciais do usuário no formato Basic (Base64 de usuario:senha).
 
-As demais ações dependem da autorização com sucesso do usuário.
+Os dados recebidos são confrontados com a base de dados (RDS), validando as credenciais informadas.
+
+As demais ações dependem da autorização bem sucedida do usuário.
 
 ### Registro de Ponto
 
@@ -26,13 +28,13 @@ As opções de evento aceitas são:
 - `INTERVAL_END`: Fim do intervalo
 - `EXIT`: Saída
 
-Ao salvar o registro, o serviço identifica o horário atual, bem como o usuário autenticado para persistir os dados no banco de dados (RDS)
+Ao salvar o registro, o serviço identifica o horário atual, bem como o usuário autenticado para persistir os dados no banco de dados (RDS).
 
 ### Listar Marcações
 
-Usuário solicita as informações através de requisição GET ao respectivo endpoint. O serviço identifica o usuário autenticado e consulta as marcações realizadas no período de 30 dias retroativos.
+O usuário solicita as informações através de requisição GET ao respectivo endpoint. O serviço identifica o usuário autenticado e consulta as marcações realizadas no período de 30 dias retroativos no banco de dados (RDS).
 
-O resultado é apresentado no formato JSON, indicando as datas em que o usuário registrou marcação, relacionando as marcações e os tipos de marcação realizadas. Por fim, para cada data informa o total de horas trabalhadas no respectivo dia, conforme exemplo:
+O resultado é apresentado no formato JSON, indicando as datas em que o usuário registrou marcação, relacionando as marcações e os tipos de marcações realizadas. Por fim, para cada data informa o total de horas trabalhadas no respectivo dia, conforme exemplo:
 
 ```json
 {
@@ -85,7 +87,7 @@ Sendo uma requisição válida, a solicitação de geração de espelho de ponto
 
 A geração do espelho de ponto é um processo que não necessita da requisição do usuário, pois a inclusão da solicitação na fila SQS, gerada na etapa anterior, dispara a execução desse serviço.
 
-Ao consumir a fila, o processo realiza a geração do arquivo em formato CSV e o armazena no bucket S3, gerando uma URL pré-assinada.
+Ao consumir a fila, o processo realiza a geração do arquivo em formato CSV e o armazena em um bucket S3, gerando uma URL pré-assinada.
 
 A partir da geração do arquivo, um e-mail é enviado ao solicitante do espelho de ponto, contendo a URL pré-assinada associada ao arquivo, permitindo o seu download.
 
