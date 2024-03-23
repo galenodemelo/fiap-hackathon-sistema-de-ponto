@@ -66,6 +66,7 @@ Resources:
         RegisterPunch:
           Type: HttpApi
           Properties:
+            ApiId: !Ref ApiGateway
             Path: /punch
             Method: post
 
