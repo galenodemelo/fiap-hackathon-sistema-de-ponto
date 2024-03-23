@@ -1,5 +1,6 @@
 package br.com.fiap;
 
+import br.com.fiap.queue.ReportQueueSqsManager;
 import br.com.fiap.queue.SqsManager;
 import br.com.fiap.report.dto.AskForReportRequestDTO;
 import br.com.fiap.report.dto.ReportQueueDTO;
@@ -45,8 +46,7 @@ public class AskForReportHandler implements RequestHandler<APIGatewayProxyReques
                 askForReportRequestDTO.endDate()
             );
 
-            final String queueName = "report-q";
-            SqsManager sqsManager = new SqsManager(queueName);
+            SqsManager sqsManager = new ReportQueueSqsManager();
             sqsManager.sendMessage(mapper.writeValueAsString(reportQueueDTO));
 
             return ResponseUtils.ok("Relatório será enviado por e-mail");

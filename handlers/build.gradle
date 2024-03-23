@@ -15,6 +15,12 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-databind:2.17.0"
     implementation "org.mindrot:jbcrypt:0.4"
     implementation "io.awspring.cloud:spring-cloud-aws-starter-sqs:3.0.4"
+    implementation "com.sun.mail:javax.mail:1.6.2"
+
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.11.26'
+    implementation platform('com.amazonaws:aws-java-sdk-bom:1.11.228')
+    implementation 'io.awspring.cloud:spring-cloud-aws:3.0.4'
+
 }
 
 sourceCompatibility = 17
