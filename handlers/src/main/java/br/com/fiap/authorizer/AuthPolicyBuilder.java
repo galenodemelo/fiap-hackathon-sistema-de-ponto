@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.events.IamPolicyResponse;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class AuthPolicyBuilder {
 
@@ -14,6 +15,7 @@ public class AuthPolicyBuilder {
         return IamPolicyResponse.builder()
                 .withPrincipalId(principalId)
                 .withPolicyDocument(buildPolicyDocument(statementList))
+                .withContext(Map.of("principalId", principalId))
                 .build();
     }
 
