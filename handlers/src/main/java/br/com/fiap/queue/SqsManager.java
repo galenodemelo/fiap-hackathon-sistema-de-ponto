@@ -4,7 +4,7 @@ import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
 
-public class SqsManager {
+abstract public class SqsManager {
 
     private final String queueName;
 
@@ -17,6 +17,14 @@ public class SqsManager {
 
         try (sqsClient) {
             sqsClient.sendMessage(to -> to.queueUrl(this.queueName).messageBody(message));
+        }
+    }
+
+    public void deleteMessage(String receiptHandle) {
+        SqsClient sqsClient = buildClient();
+
+        try (sqsClient) {
+            sqsClient.deleteMessage(to -> to.queueUrl(this.queueName).receiptHandle(receiptHandle));
         }
     }
 
