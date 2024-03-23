@@ -9,6 +9,7 @@ Globals:
     MemorySize: 512
 
 Resources:
+
   ApiGateway:
     Type: AWS::Serverless::HttpApi
     Properties:
@@ -25,6 +26,7 @@ Resources:
   AuthorizerFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Role: arn:aws:iam::339712985210:role/LabRole
       CodeUri: handlers
       Handler: br.com.fiap.authorizer.AuthorizerHandler::handleRequest
       Runtime: java17
@@ -35,6 +37,7 @@ Resources:
   ListPunchesFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Role: arn:aws:iam::339712985210:role/LabRole
       CodeUri: handlers
       Handler: br.com.fiap.ListPunchesHandler::handleRequest
       Runtime: java17
@@ -52,6 +55,7 @@ Resources:
   RegisterPunchesFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Role: arn:aws:iam::339712985210:role/LabRole
       CodeUri: handlers
       Handler: br.com.fiap.RegisterPunchesHandler::handleRequest
       Runtime: java17
@@ -68,6 +72,7 @@ Resources:
   AskForReportFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Role: arn:aws:iam::339712985210:role/LabRole
       CodeUri: handlers
       Handler: br.com.fiap.AskForReportHandler::handleRequest
       Runtime: java17
@@ -90,6 +95,7 @@ Resources:
   GenerateReportFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Role: arn:aws:iam::339712985210:role/LabRole
       CodeUri: handlers
       Handler: br.com.fiap.GenerateReportHandler::handleRequest
       Runtime: java17
