@@ -9,6 +9,29 @@ Globals:
     MemorySize: 512
 
 Resources:
+  ApiGateway:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        DefaultAuthorizer: LoginAuthorizer
+        Authorizers:
+          LoginAuthorizer:
+            FunctionArn: !GetAtt AuthorizerFunction.Arn
+            AuthorizerPayloadFormatVersion: "1.0"
+            Identity:
+              Headers:
+                - Authorization
+
+  AuthorizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: handlers
+      Handler: br.com.fiap.authorizer.AuthorizerHandler::handleRequest
+      Runtime: java17
+      Architectures:
+        - x86_64
+      MemorySize: 128
+
   ListPunchesFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -20,10 +43,12 @@ Resources:
       MemorySize: 512
       Events:
         ListPunches:
-          Type: Api
+          Type: HttpApi
           Properties:
-            Path: /punches
+            ApiId: !Ref ApiGateway
+            Path: /punch
             Method: get
+
   RegisterPunchesFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -35,7 +60,7 @@ Resources:
       MemorySize: 512
       Events:
         RegisterPunch:
-          Type: Api
+          Type: HttpApi
           Properties:
             Path: /punch
             Method: post
